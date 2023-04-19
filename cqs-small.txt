@@ -1,0 +1,273 @@
+Reading comprehension for Smalltalk
+=====================================
+
+###  Instructions ###
+
+Edit this file, `cqs-small.txt`, to answer the questions below. There are
+markers indicating where you should write your answers for each question.
+Once you've edited the file, submit it by following the steps outlined on the
+homework spec.
+
+###  Questions  ###
+
+For questions 1-3, read the first eleven pages of chapter 10 (through the end of
+section 10.1.4) to learn about the fundamentals of SmallTalk through an extended
+example.
+
+ 1. *Receivers, arguments, and message names.*
+    Consider these expressions found in the definition of class
+    `Picture` in figure 10.4 on page 617:
+
+        (shapes add: aShape)
+        (shape drawOn: aCanvas)
+        (shapes do: [block (shape) (shape drawOn: aCanvas)])
+
+    In each expression, please identify the *receiver*, the
+    *argument*, and the *message name*:
+
+    In `(shapes add: aShape)`,
+    
+      - The receiver is ...
+      - The argument is ...
+      - The message name is ...
+
+    In `(shape drawOn: aCanvas)`,
+    
+      - The receiver is ...
+      - The argument is ...
+      - The message name is ...
+
+    In `(shapes do: [block (shape) (shape drawOn: aCanvas)])`,
+    
+      - The receiver is ...
+      - The argument is ...
+      - The message name is ...
+
+
+    _You can now start to read code examples._
+
+ 2. *Colons in message names*.
+    This reading included some information about message/method names,
+    specifically about what colons are used for in these names (see the top
+    paragraph of page 612). What isn't clearly specified is that if a message
+    name starts with a non-letter and has no colons, it takes 1 argument. This
+    is different from message names that do start with a letter: such a message
+    has n arguments if the message name has n colons in it. 
+
+    Given this information, how many arguments do each of the following messages
+    take:
+
+      - `+` takes ... argument(s).
+
+      - `<=` takes ... argument(s).
+
+      - `print` takes ... argument(s).
+
+      - `draw:width:height:` takes ... argument(s).
+
+
+    _You now know what a message's name tells you about how to use it._
+
+
+ 3. *Class protocols and instance protocols.*
+    Every *message* is part of some *protocol*.  As example messages,
+    review the transcript in code chunks 612b and 612c, which
+    puts three shapes into a picture and then draws the picture.
+
+    (a) Of the message names used in the transcript, which ones are
+        part of the _class_ protocol for `Picture`?
+
+        >
+        
+
+        Which message names are part of the _instance_ protocol for
+        `Picture`?
+
+        >
+
+    
+        Which message names are part of the _class_ protocol for
+        `TikzCanvas`?
+
+        >
+        
+
+        Which message names are part of the _instance_ protocol for
+        `TikzCanvas`?
+
+        >
+
+
+    (b) In general, what do you do with messages in a _class_ protocol, and how
+        does that differ from what you do with messages in an _instance_
+        protocol? In other words, who is the receiver for a message from each
+        kind of protocol? Choose your answers from the following list:
+
+          - A class object
+          - An instance of a class
+        
+        >
+
+
+    _You now know what you can do with each kind of message described
+    in the chapter._
+
+For question 4, first read the penultimate paragraph of section 10.3.3 on page
+631 about the special names `self` and `super`. Then read section 10.3.4 to
+learn about the mechanisms of message send and dynamic dispatch .
+
+ 4. *Dynamic dispatch, part I: A toy class*.
+    Consider the `B` and `C` class definitions from this section.
+    In code chunk 632b, message `m1` is sent to an object of class `C`.
+    What method *definitions* are dispatched to, in what order?
+
+    Please edit this answer to put in the correct methods and classes:
+
+      - Dispatch to method m1 on class ?
+      - Dispatch to method  ? on class ?
+        ...
+
+    _You are starting to understand the key mechanism behind all of
+    object-oriented programming._
+
+For question 5, read section 10.6 to learn how method dispatch replaces
+conditionals in SmallTalk.
+
+ 5. *Dynamic dispatch, part II: Conditionals? What conditionals?*
+     Consider this transcript:
+
+        -> ('hello isNil)
+        <False>
+        -> (nil isNil)
+        <True>
+        -> ('hello class)
+        <class Symbol>
+        -> (('hello class) superclass)
+        <class Object>
+        -> (nil class)
+        <class UndefinedObject>
+        -> ((nil class) superclass)
+        <class Object>
+
+    Answer these two questions:
+
+    (a) Explain how it is possible that the `isNil` method can be
+        implemented without an equality test and without any explicit
+        conditional test (like an `if`).  Your explanation should
+        include a statement of what messages are sent to what objects
+        and what method definition each message dispatches to.
+
+        >
+
+
+    (b) Explain _why_ it is desirable to implement object-oriented
+        code without explicit conditional tests, and indeed, without
+        ever asking an object, "how were you formed?"
+
+        >
+
+
+    _You are starting to learn how to work effectively in a world
+    where we don't interrogate objects to see how they were formed or
+    what class they are._
+
+For question 6, read section 10.4.6 (stopping after getting to the end of page
+651) to learn about the numeric class hierarchy.
+
+ 6. *Dynamic dispatch, part III: Number classes.*
+    Now that you've learned about the Number and Fraction classes
+    (conceptually), let's consider some specific parts of their class
+    definitions. 
+
+    The Number class has many methods that delegate their implementations to
+    subclasses, e.g.,:
+        
+        (method + (aNumber) (self subclassResponsibility))
+        (method negated ()  (self subclassResponsibility))
+
+    It also has methods that are implemented on top of these `subclass
+    responsibility` methods:
+
+        (method - (y) (self + (y negated)))
+
+    The Fraction subclass inherits all three of these example methods, but it
+    also redefines the `+` and `negated` methods to do something reasonable.
+    To summarize, the Number class has methods `+`, `negated`, and `-` (the last
+    implemented in terms of the first two), and the Fraction subclass redefines
+    methods `+` and `negated`. 
+    
+    Given that, consider the following expression:
+
+        ((1 / 2) - (1 / 3)) 
+
+    Evaluating this expression will involve the `-`, `+`, and `negated` messages
+    being sent. Based on which classes define each method and the definition of
+    the `-` method in class Number (given above), fill in the table below to
+    indicate which class sent the message, to what class of object the message
+    was sent, and which class's method will respond to that message:
+
+
+        Message   Sent from method        Sent to object    Response comes
+                  defined on class "___"  of class "___"    from method defined
+                                                            on class "___"
+
+        -          N/A (the user sent 
+                   the message from         Fraction        Number
+                   the interactive prompt)
+
+        negated    Number                     ?                 ?
+
+
+        +             ?                       ?                 ?
+
+                         ... fill in the ? marks ...
+
+    _You are starting to learn how a class can have some of its work
+    done for it by its superclass._
+
+For question 7, read section 10.8.3 starting on page 666 about double dispatch.
+And read the section "laws for multiple dispatch" in the 7th lesson on program
+design.
+
+ 7. *Double Dispatch*.
+
+    (a) In code chunk 667, the `+` method uses double dispatch. This method is
+        triggered when an object of the `SmallInteger` class receives the `+`
+        message. The method sends message `addSmallIntegerTo:`, whose name
+        encodes both the original message `+` that triggered this message send
+        (encoded in "add...To") and the receiver of that original message
+        "SmallInteger". If a `LargeInteger` class also wished to implement `+`
+        with double dispatch, what is the name of the message it should send in
+        response to a `+` message? 
+
+        > 
+
+
+    (b) Consider the execution of the following message send, where `lint` and
+        `sint` are large integer and small integer objects, respectively:
+
+            (sint + lint)
+
+        This will trigger the execution of the `+` method from code chunk 667.
+        In that method, which object will be bound to variable `anInteger`, and
+        which will be referred to by name `self`? Use the names `sint` and/or
+        `lint` to answer.
+
+        > ??? will be bound to `anInteger`
+        
+        > `self` will refer to ???
+    
+    (c) In the 7 lessons reading, methods `timesPos:` and `timesNeg:` were
+        implemented. Given these methods and what you've learned about double
+        dispatch, write the SmallTalk code implementing method `*` for the
+        `LargePositiveInteger` class. It will be very similar to code chunk
+        675b, and it should use either `timesPos:` or `timesNeg:`.
+
+        >
+
+    _You are ready to implement arithmetic on large integers (exercise 2)._
+
+
+
+
+
