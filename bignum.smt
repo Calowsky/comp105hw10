@@ -15,7 +15,7 @@
          {(NatNonzero first:rest: (n mod: (self base)) (self fromSmall: (n div: (self base))))  }
        )
    )
-   (class-method base () 10) ; private
+   (class-method base () 2) ; private
 
    ; private methods suggested from textbook (page 681)
    (method modBase () (self subclassResponsibility)) 
@@ -31,7 +31,7 @@
    (method = (aNatural) (self leftAsExercise))
    (method < (aNatural) (self leftAsExercise))
 
-   (method + (aNatural) (self leftAsExercise))
+   (method + (aNatural) (self plus:carry: aNatural 0))
    (method * (aNatural) (self subclassResponsibility))
    (method subtract:withDifference:ifNegative: (aNatural diffBlock exnBlock)
       (self leftAsExercise))
@@ -64,7 +64,7 @@
    (class-method first:rest: (anInteger aNatural)
       (((anInteger = 0) & (aNatural isZero )) ifTrue:ifFalse:
          {(NatZero new)}
-         {((NatNonzero new) first:rest:) anInteger aNatural )}
+         {((NatNonzero new) first:rest: anInteger aNatural)}
       )
    )
 
@@ -76,6 +76,34 @@
   (method invariant () true) ;; private
   (method isZero () true)
   (method timesDigit:plus: (d r) (Natural fromSmall: r)) ; private
+  (method divBase () self )
+  (method modBase () 0 )
+  (method timesBase () self )
+  (method * (nat) self )
+  (method sdivmod:with: (n cont) (cont value:value: self 0) )
+  (method compare:withLt:withEq:withGt: (aNatural ltBlock eqBlock gtBlock) ( (aNatural isZero) ifTrue:ifFalse:
+      (eqBlock value)
+      (ltBlock value)
+    )
+    
+    )
+
+ (method plus:carry: (aNatural c)
+    ((aNatural isZero) ifTrue:ifFalse:
+      {(Natural fromSmall: c)}
+      {(aNatural + (Natural fromSmall: c))}
+    )
+    )
+
+(method minus:borrow: (aNatural b) 
+      ;;both??
+     (((aNatural isZero) & (b = 0)) ifTrue:ifFalse:
+         {self}
+         {(self error: 'subtraction-went-negative) } 
+     )
+     
+   )
+
 
   ;; for debugging
   (method printrep () (0 print))
@@ -122,9 +150,14 @@
   ;; debugging method
   (method printrep () (m printrep) (', print) (d print))
 
-  (class-method first:rest: (anInteger aNatural)
+  (method first:rest: (anInteger aNatural)
       (set m aNatural) (set d anInteger) self)
   
+  (method divBase () m )
+  (method modBase () d )
+  
+  (method timesBase () ((NatNonzero new) first:rest: 0 self))
+
 
 )
 
@@ -142,7 +175,65 @@
 ;; Put your unit tests for Exercise 1 here
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (check-assert ((Natural fromSmall: 0) isZero) )
-(Natural fromSmall: 3)
+(check-assert (((Natural fromSmall: 43) isZero) not))
+(check-print (DebugNat of: (Natural fromSmall: 0))
+             0)
+(check-print (DebugNat of: 
+                (Natural fromSmall: ((Natural base) * (Natural base))))
+             0,1,0,0)  ;; or it might have a leading zero
+(check-print (DebugNat of: (Natural fromSmall: 1))
+             0,1)
+(check-print (DebugNat of: (Natural fromSmall: 1000))
+             0,1,1,1,1,1,0,1,0,0,0)
+(check-print (DebugNat of: (Natural fromSmall: 1234))
+             0,1,0,0,1,1,0,1,0,0,1,0)
+(check-print (DebugNat of: (Natural fromSmall: 4096))
+             0,1,0,0,0,0,0,0,0,0,0,0,0,0)
+
+;; test for step 10
+(check-assert (((Natural fromSmall: 4096) divBase ) isKindOf: Natural))
+(check-assert (((Natural fromSmall: 0) divBase ) isKindOf: Natural))
+
+(check-assert (((Natural fromSmall: 4096) timesBase ) isKindOf: Natural))
+(check-assert (((Natural fromSmall: 0) timesBase ) isKindOf: Natural))
+
+(check-assert (((Natural fromSmall: 4096) modBase ) isKindOf: SmallInteger))
+(check-assert (((Natural fromSmall: 0) modBase ) isKindOf: SmallInteger))
+
+(check-assert (3 isKindOf: SmallInteger))
+
+
+(check-print (DebugNat of: ((Natural fromSmall: 4096) divBase ))
+             0,1,0,0,0,0,0,0,0,0,0,0,0)
+
+(check-print  ((Natural fromSmall: 4096) modBase )
+             0)
+(check-print  ((Natural fromSmall: 4097) modBase )
+             1)
+(check-print  ((Natural fromSmall: 1) modBase )
+             1)
+(check-print (DebugNat of: ((Natural fromSmall: 3) timesBase ))
+             0,1,1,0)
+  
+(check-print (DebugNat of: ((Natural fromSmall: 0) divBase ))
+             0)
+
+(check-print ((Natural fromSmall: 4096) modBase )
+             0)
+(check-print (DebugNat of: ((Natural fromSmall: 0) timesBase ))
+             0)
+
+
+;;testing addition
+(check-print (DebugNat of: ((Natural fromSmall: 0) + (Natural fromSmall: 0) ))
+             0)
+(check-print (DebugNat of: ((Natural fromSmall: 0) + (Natural fromSmall: 1) ))
+             0,1)
+(check-print (DebugNat of: ((Natural fromSmall: 4) + (Natural fromSmall: 33) ))
+             0,1,0,0,1,0,1)
+(check-print (DebugNat of: ((Natural fromSmall: 100) + (Natural fromSmall: 0) ))
+             0,1,1,0,0,1,0,0)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
