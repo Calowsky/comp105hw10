@@ -21,7 +21,7 @@
       {(NatZero new)}
       {((NatNonzero new) first:rest: anInteger aNatural)}))
 
-  (class-method base () 2) ; private
+  (class-method base () 32767) ; private
 
   ; private methods suggested from textbook (page 681)
   (method modBase () (self subclassResponsibility)) 
@@ -34,13 +34,19 @@
 
   (method timesDigit:plus: (d r) (self subclassResponsibility)) ; private
 
-  (method = (aNatural) (self leftAsExercise))
-  (method < (aNatural) (self leftAsExercise))
+  (method = (aNatural) 
+    (self compare:withLt:withEq:withGt:
+      aNatural {false} {true} {false}))
+  (method < (aNatural) 
+    (self compare:withLt:withEq:withGt:
+      aNatural {true} {false} {false}))
 
   (method + (aNatural) (self plus:carry: aNatural 0))
   (method * (aNatural) (self subclassResponsibility))
   (method subtract:withDifference:ifNegative: (aNatural diffBlock exnBlock)
-    (self leftAsExercise))
+    ((self < aNatural) ifTrue:ifFalse: 
+      exnBlock 
+      {(self minus:borrow: aNatural 0)}))
 
   (method sdivmod:with: (n aBlock) (self subclassResponsibility))
 
@@ -83,7 +89,7 @@
     {(K value:value: self 0)}
     {(self error: 'Bad-divisor)}))
   (method compare:withLt:withEq:withGt: (aNatural ltBlock eqBlock gtBlock)
-    ((aNatural isZero) ifTrue:ifFalse: (eqBlock value) (ltBlock value)))
+    ((aNatural isZero) ifTrue:ifFalse: {(eqBlock value)} {(ltBlock value)}))
 
   (method plus:carry: (aNatural c)
     ((aNatural isZero) ifTrue:ifFalse:
@@ -96,6 +102,7 @@
       {(self error: 'subtraction-went-negative)}))
 
   ;; for debugging
+  (method decimal () ((List new) addFirst: 0))
   (method printrep () (0 print))
 )
 
@@ -159,6 +166,24 @@
             (Q timesDigit:plus: b (((r * b) + x0) div: v)) ;; Q'
             (((r * b) + x0) mod: v))))} ;; r'
       {(self error: 'Bad-divisor)}))
+
+  (method decimal () [locals digits X] 
+    (set digits (List new))
+    (set X self)
+    ({(X isZero)} whileFalse: 
+      {(set digits (digits addFirst: (X smod: 10)))
+       (set X (X sdiv: 10))})
+    digits)
+
+  (method compare:withLt:withEq:withGt: (aNatural ltBlock eqBlock gtBlock)
+    ((self divBase) compare:withLt:withEq:withGt: (aNatural divBase)
+      ltBlock 
+      {(((self modBase) = (aNatural modBase)) ifTrue:ifFalse:
+        {(eqBlock value)}
+        {(((self modBase) < (aNatural modBase)) ifTrue:ifFalse:
+          {(ltBlock value)}
+          {(gtBlock value)})})}
+      gtBlock))
 )
 
 ; For testing naturals
@@ -176,71 +201,28 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (check-assert ((Natural fromSmall: 0) isZero) )
 (check-assert (((Natural fromSmall: 43) isZero) not))
-(check-print (DebugNat of: (Natural fromSmall: 0))
-             0)
-(check-print (DebugNat of: 
-                (Natural fromSmall: ((Natural base) * (Natural base))))
-             0,1,0,0)  ;; or it might have a leading zero
-(check-print (DebugNat of: (Natural fromSmall: 1))
-             0,1)
-(check-print (DebugNat of: (Natural fromSmall: 1000))
-             0,1,1,1,1,1,0,1,0,0,0)
-(check-print (DebugNat of: (Natural fromSmall: 1234))
-             0,1,0,0,1,1,0,1,0,0,1,0)
-(check-print (DebugNat of: (Natural fromSmall: 4096))
-             0,1,0,0,0,0,0,0,0,0,0,0,0,0)
 
 ;; test for step 10
-(check-assert (((Natural fromSmall: 4096) divBase ) isKindOf: Natural))
-(check-assert (((Natural fromSmall: 0) divBase ) isKindOf: Natural))
+(check-assert (((Natural fromSmall: 4096) divBase) isKindOf: Natural))
+(check-assert (((Natural fromSmall: 0) divBase) isKindOf: Natural))
 
-(check-assert (((Natural fromSmall: 4096) timesBase ) isKindOf: Natural))
-(check-assert (((Natural fromSmall: 0) timesBase ) isKindOf: Natural))
+(check-assert (((Natural fromSmall: 4096) timesBase) isKindOf: Natural))
+(check-assert (((Natural fromSmall: 0) timesBase) isKindOf: Natural))
 
-(check-assert (((Natural fromSmall: 4096) modBase ) isKindOf: SmallInteger))
-(check-assert (((Natural fromSmall: 0) modBase ) isKindOf: SmallInteger))
+(check-assert (((Natural fromSmall: 4096) modBase) isKindOf: SmallInteger))
+(check-assert (((Natural fromSmall: 0) modBase) isKindOf: SmallInteger))
 
 (check-assert (3 isKindOf: SmallInteger))
-
-
-(check-print (DebugNat of: ((Natural fromSmall: 4096) divBase ))
-             0,1,0,0,0,0,0,0,0,0,0,0,0)
-
-(check-print  ((Natural fromSmall: 4096) modBase )
-             0)
-(check-print  ((Natural fromSmall: 4097) modBase )
-             1)
-(check-print  ((Natural fromSmall: 1) modBase )
-             1)
-(check-print (DebugNat of: ((Natural fromSmall: 3) timesBase ))
-             0,1,1,0)
-  
-(check-print (DebugNat of: ((Natural fromSmall: 0) divBase ))
-             0)
-
-(check-print ((Natural fromSmall: 4096) modBase )
-             0)
-(check-print (DebugNat of: ((Natural fromSmall: 0) timesBase ))
-             0)
-
+;; (check-print  ((Natural fromSmall: 4096) modBase) 4096)
+;; (check-print  ((Natural fromSmall: 4097) modBase) 4097)
+;; (check-print  ((Natural fromSmall: 1) modBase ) 1)
+(check-print ((Natural fromSmall: 0) divBase) 0)
+;; (check-print ((Natural fromSmall: 4096) modBase) 4096)
+(check-print ((Natural fromSmall: 0) timesBase) 0)
 
 ;;testing addition
-(check-print (DebugNat of: ((Natural fromSmall: 0) + (Natural fromSmall: 0)))
-             0)
-(check-print (DebugNat of: ((Natural fromSmall: 0) + (Natural fromSmall: 1)))
-             0,1)
-(check-print (DebugNat of: ((Natural fromSmall: 4) + (Natural fromSmall: 33)))
-             0,1,0,0,1,0,1)
-(check-print (DebugNat of: ((Natural fromSmall: 100) + (Natural fromSmall: 0)))
-             0,1,1,0,0,1,0,0)
 
 ;;testing division 
-(check-print (DebugNat of: ((Natural fromSmall: 15) sdiv: 2))
-             0,1,1,1)
-(check-print (DebugNat of: ((Natural fromSmall: 0) sdiv: 2))
-             0)
-(check-print (DebugNat of: ((Natural fromSmall: 11) sdiv: 4))
-             0,1,0)
 (check-error ((Natural fromSmall: 12) sdiv: 0))
 (check-error ((Natural fromSmall: 0) sdiv: 0))
 
@@ -249,6 +231,48 @@
 (check-print ((Natural fromSmall: 0) smod: 2) 0)
 (check-print ((Natural fromSmall: 12) smod: 4) 0)
 (check-error ((Natural fromSmall: 12) smod: 0))
+
+;; test decimal
+(check-print (Natural fromSmall: 0) 0)
+(check-print (Natural fromSmall: 1) 1)
+(check-print (Natural fromSmall: 1000) 1000)
+(check-print (Natural fromSmall: 1234) 1234)
+
+;; comparison checks
+(check-print ((Natural fromSmall: 0) compare-symbol: (Natural fromSmall: 0)) EQ)
+(check-print ((Natural fromSmall: 10) compare-symbol: (Natural fromSmall: 0)) GT)
+(check-print ((Natural fromSmall: 0) compare-symbol: (Natural fromSmall: 10)) LT)
+(check-print ((Natural fromSmall: 1007) compare-symbol: (Natural fromSmall: 1009)) LT)
+(check-print ((Natural fromSmall: 10009) compare-symbol: (Natural fromSmall: 1009)) GT)
+(check-print ((Natural fromSmall: 1009) compare-symbol: (Natural fromSmall: 1009)) EQ)
+(check-print ((Natural fromSmall: 1009) compare-symbol: (Natural fromSmall: 9)) GT)
+(check-print ((Natural fromSmall: 9) compare-symbol: (Natural fromSmall: 1009)) LT)
+(check-print ((Natural fromSmall: 8) compare-symbol: (Natural fromSmall: 1009)) LT)
+
+(check-assert ((Natural fromSmall: 0) = (Natural fromSmall: 0)))
+(check-assert ((Natural fromSmall: 10) > (Natural fromSmall: 0)))
+(check-assert ((Natural fromSmall: 0) < (Natural fromSmall: 10)))
+(check-assert ((Natural fromSmall: 1007) < (Natural fromSmall: 1009)))
+(check-assert ((Natural fromSmall: 10009) > (Natural fromSmall: 1009)))
+(check-assert ((Natural fromSmall: 1009) = (Natural fromSmall: 1009)))
+(check-assert ((Natural fromSmall: 1009) > (Natural fromSmall: 9)))
+(check-assert ((Natural fromSmall: 9) < (Natural fromSmall: 1009)))
+(check-assert ((Natural fromSmall: 8) < (Natural fromSmall: 1009)))
+
+;; test subtraction
+
+(check-print ((Natural fromSmall: 10) - (Natural fromSmall: 8)) 2)
+(check-print ((Natural fromSmall: 10) - (Natural fromSmall: 10)) 0)
+(check-print ((Natural fromSmall: 10) - (Natural fromSmall: 0)) 10)
+(check-print ((Natural fromSmall: 0) - (Natural fromSmall: 0)) 0)
+(check-error ((Natural fromSmall: 0) - (Natural fromSmall: 1)))
+(check-error ((Natural fromSmall: 8) - (Natural fromSmall: 10)))
+
+(check-print 
+    ((Natural fromSmall: 87654321) * (Natural fromSmall: 12345678))
+    1082152022374638)
+
+;; stress test
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
