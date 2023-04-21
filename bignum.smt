@@ -7,66 +7,65 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (class Natural
-   [subclass-of Magnitude]
+  [subclass-of Magnitude]
 
-   (class-method fromSmall: (n)
-       ((n = 0) ifTrue:ifFalse:
-         {(NatZero new)}
-         {(NatNonzero first:rest: (n mod: (self base)) (self fromSmall: (n div: (self base))))  }
-       )
-   )
-   (class-method base () 2) ; private
+  (class-method fromSmall: (n)
+    ((n = 0) ifTrue:ifFalse:
+      {(NatZero new)}
+      {(NatNonzero first:rest: 
+          (n mod: (self base))
+          (self fromSmall: (n div: (self base))))}))
 
-   ; private methods suggested from textbook (page 681)
-   (method modBase () (self subclassResponsibility)) 
-   (method divBase () (self subclassResponsibility)) 
-   (method timesBase () (self subclassResponsibility)) 
-   (method compare:withLt:withEq:withGt: (aNatural ltBlock eqBlock gtBlock) 
-      (self subclassResponsibility)) 
-   (method plus:carry: (aNatural c) (self subclassResponsibility)) 
-   (method minus:borrow: (aNatural c) (self subclassResponsibility)) 
+  (class-method first:rest: (anInteger aNatural)
+    (((anInteger = 0) & (aNatural isZero )) ifTrue:ifFalse:
+      {(NatZero new)}
+      {((NatNonzero new) first:rest: anInteger aNatural)}))
 
-   (method timesDigit:plus: (d r) (self subclassResponsibility)) ; private
+  (class-method base () 2) ; private
 
-   (method = (aNatural) (self leftAsExercise))
-   (method < (aNatural) (self leftAsExercise))
+  ; private methods suggested from textbook (page 681)
+  (method modBase () (self subclassResponsibility)) 
+  (method divBase () (self subclassResponsibility)) 
+  (method timesBase () (self subclassResponsibility)) 
+  (method compare:withLt:withEq:withGt: (aNatural ltBlock eqBlock gtBlock) 
+    (self subclassResponsibility)) 
+  (method plus:carry: (aNatural c) (self subclassResponsibility)) 
+  (method minus:borrow: (aNatural c) (self subclassResponsibility)) 
 
-   (method + (aNatural) (self plus:carry: aNatural 0))
-   (method * (aNatural) (self subclassResponsibility))
-   (method subtract:withDifference:ifNegative: (aNatural diffBlock exnBlock)
-      (self leftAsExercise))
+  (method timesDigit:plus: (d r) (self subclassResponsibility)) ; private
 
-   (method sdivmod:with: (n aBlock) (self subclassResponsibility))
+  (method = (aNatural) (self leftAsExercise))
+  (method < (aNatural) (self leftAsExercise))
 
-   (method decimal () (self leftAsExercise))
-   (method isZero  () (self subclassResponsibility))
+  (method + (aNatural) (self plus:carry: aNatural 0))
+  (method * (aNatural) (self subclassResponsibility))
+  (method subtract:withDifference:ifNegative: (aNatural diffBlock exnBlock)
+    (self leftAsExercise))
 
-   ; methods that are already implemented for you
-   (method - (aNatural)
-      (self subtract:withDifference:ifNegative:
-            aNatural
-            [block (x) x]
-            {(self error: 'Natural-subtraction-went-negative)}))
-   (method sdiv: (n) (self sdivmod:with: n [block (q r) q]))
-   (method smod: (n) (self sdivmod:with: n [block (q r) r]))
-   (method print () ((self decimal) do: [block (x) (x print)]))
+  (method sdivmod:with: (n aBlock) (self subclassResponsibility))
 
-   ;private methods for testing
-   (method validated ()
+  (method decimal () (self leftAsExercise))
+  (method isZero  () (self subclassResponsibility))
+
+ ; methods that are already implemented for you
+  (method - (aNatural)
+    (self subtract:withDifference:ifNegative:
+      aNatural
+      [block (x) x]
+      {(self error: 'Natural-subtraction-went-negative)}))
+  (method sdiv: (n) (self sdivmod:with: n [block (q r) q]))
+  (method smod: (n) (self sdivmod:with: n [block (q r) r]))
+  (method print () ((self decimal) do: [block (x) (x print)]))
+
+ ;private methods for testing
+  (method validated ()
     ((self invariant) ifFalse:
-      {(self printrep)
-       (self error: 'invariant-violation)})
+    {(self printrep)
+     (self error: 'invariant-violation)})
     self)
 
-   (method compare-symbol: (aNat)
+  (method compare-symbol: (aNat)
     (self compare:withLt:withEq:withGt: aNat {'LT} {'EQ} {'GT}))
-
-   (class-method first:rest: (anInteger aNatural)
-      (((anInteger = 0) & (aNatural isZero )) ifTrue:ifFalse:
-         {(NatZero new)}
-         {((NatNonzero new) first:rest: anInteger aNatural)}
-      )
-   )
 
 )
 
@@ -80,30 +79,21 @@
   (method modBase () 0 )
   (method timesBase () self )
   (method * (nat) self )
-  (method sdivmod:with: (n cont) (cont value:value: self 0) )
-  (method compare:withLt:withEq:withGt: (aNatural ltBlock eqBlock gtBlock) ( (aNatural isZero) ifTrue:ifFalse:
-      (eqBlock value)
-      (ltBlock value)
-    )
-    
-    )
+  (method sdivmod:with: (v K) ((v < 1) ifFalse:ifTrue:
+    {(K value:value: self 0)}
+    {(self error: 'Bad-divisor)}))
+  (method compare:withLt:withEq:withGt: (aNatural ltBlock eqBlock gtBlock)
+    ((aNatural isZero) ifTrue:ifFalse: (eqBlock value) (ltBlock value)))
 
- (method plus:carry: (aNatural c)
+  (method plus:carry: (aNatural c)
     ((aNatural isZero) ifTrue:ifFalse:
       {(Natural fromSmall: c)}
-      {(aNatural + (Natural fromSmall: c))}
-    )
-    )
+      {(aNatural + (Natural fromSmall: c))}))
 
-(method minus:borrow: (aNatural b) 
-      ;;both??
-     (((aNatural isZero) & (b = 0)) ifTrue:ifFalse:
-         {self}
-         {(self error: 'subtraction-went-negative) } 
-     )
-     
-   )
-
+  (method minus:borrow: (aNatural b) 
+    (((aNatural isZero) & (b = 0)) ifTrue:ifFalse:
+      {self}
+      {(self error: 'subtraction-went-negative)}))
 
   ;; for debugging
   (method printrep () (0 print))
@@ -153,12 +143,22 @@
   (method first:rest: (anInteger aNatural)
       (set m aNatural) (set d anInteger) self)
   
-  (method divBase () m )
-  (method modBase () d )
+  (method divBase () m)
+  (method modBase () d)
   
   (method timesBase () ((NatNonzero new) first:rest: 0 self))
 
-
+  (method sdivmod:with: (v K) [locals b X' x0]
+    (set b (Natural base))
+    (set X' (self divBase))
+    (set x0 (self modBase))
+    ((v < 1) ifFalse:ifTrue:
+      {(X' sdivmod:with: v 
+        (block [Q r] 
+          (K value:value: 
+            (Q timesDigit:plus: b (((r * b) + x0) div: v)) ;; Q'
+            (((r * b) + x0) mod: v))))} ;; r'
+      {(self error: 'Bad-divisor)}))
 )
 
 ; For testing naturals
@@ -225,15 +225,30 @@
 
 
 ;;testing addition
-(check-print (DebugNat of: ((Natural fromSmall: 0) + (Natural fromSmall: 0) ))
+(check-print (DebugNat of: ((Natural fromSmall: 0) + (Natural fromSmall: 0)))
              0)
-(check-print (DebugNat of: ((Natural fromSmall: 0) + (Natural fromSmall: 1) ))
+(check-print (DebugNat of: ((Natural fromSmall: 0) + (Natural fromSmall: 1)))
              0,1)
-(check-print (DebugNat of: ((Natural fromSmall: 4) + (Natural fromSmall: 33) ))
+(check-print (DebugNat of: ((Natural fromSmall: 4) + (Natural fromSmall: 33)))
              0,1,0,0,1,0,1)
-(check-print (DebugNat of: ((Natural fromSmall: 100) + (Natural fromSmall: 0) ))
+(check-print (DebugNat of: ((Natural fromSmall: 100) + (Natural fromSmall: 0)))
              0,1,1,0,0,1,0,0)
 
+;;testing division 
+(check-print (DebugNat of: ((Natural fromSmall: 15) sdiv: 2))
+             0,1,1,1)
+(check-print (DebugNat of: ((Natural fromSmall: 0) sdiv: 2))
+             0)
+(check-print (DebugNat of: ((Natural fromSmall: 11) sdiv: 4))
+             0,1,0)
+(check-error ((Natural fromSmall: 12) sdiv: 0))
+(check-error ((Natural fromSmall: 0) sdiv: 0))
+
+;;testing mod 
+(check-print ((Natural fromSmall: 15) smod: 4) 3)
+(check-print ((Natural fromSmall: 0) smod: 2) 0)
+(check-print ((Natural fromSmall: 12) smod: 4) 0)
+(check-error ((Natural fromSmall: 12) smod: 0))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
