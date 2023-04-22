@@ -307,6 +307,14 @@
 
   (method sdiv: (n) (self subclassResponsibility))
   (method smod: (n) (self - ((LargeInteger fromSmall: n) * (self sdiv: n))))
+
+  (method print () (self subclassResponsibility))
+  (method isNegative () (self subclassResponsibility))
+  (method isNonnegative () (self subclassResponsibility))
+  (method isStrictlyPositive () (self subclassResponsibility))
+  (method negated () (self subclassResponsibility))
+  (method * (anInteger) (self subclassResponsibility) )
+  (method + (anInteger) (self subclassResponsibility))
 )
 
 ; Represents a positive integer
@@ -322,6 +330,29 @@
                                                   (LargeInteger fromSmall: 1))
              sdiv: (anInteger negated))
             negated)}))
+
+  (method print () ((self magnitude) print) )
+
+  (method isNegative () false )
+  (method isNonnegative () true)
+  (method isStrictlyPositive () ( ((self magnitude) isZero) ifTrue:ifFalse: 
+    {false}
+    {true}
+    ))
+  (method negated () ( LargeNegativeInteger withMagnitude: (self magnitude)))
+
+  (method * (anInteger) (anInteger multiplyByLargePositiveInteger: self) )
+  (method multiplyByLargePositiveInteger: (anInteger) (  LargePositiveInteger withMagnitude: ( (self magnitude) * (anInteger magnitude))) )
+  (method multiplyByLargeNegativeInteger: (anInteger) (  LargeNegativeInteger withMagnitude: ( (self magnitude) * (anInteger magnitude)) ) )
+
+ 
+  (method + (anInteger) (anInteger addLargePositiveIntegerTo: self) )
+  (method addLargePositiveIntegerTo: (anInteger) (  LargePositiveInteger withMagnitude: ( (self magnitude) + (anInteger magnitude))) ) 
+  (method addLargeNegativeIntegerTo: (anInteger) ( ((self magnitude) > (anInteger magnitude) ) ifTrue:ifFalse:
+    {(  LargePositiveInteger withMagnitude: ( (self magnitude) - (anInteger magnitude)))}
+    {(  LargeNegativeInteger withMagnitude: ( (anInteger magnitude) - (self magnitude)))}
+  )) 
+
 )
 
 ;; Represents a negative integer
@@ -331,8 +362,142 @@
   ;; short division (already implemented for you)
   (method sdiv: (anInteger)
     ((self negated) sdiv: (anInteger negated)))
+
+  (method print () (((self magnitude) isZero) ifFalse: 
+    {('- print)}  )
+  ((self magnitude) print)
+  ) 
+
+
+  (method isNegative () ( ((self magnitude) isZero) ifTrue:ifFalse: 
+    {false}
+    {true}
+    ))
+
+  (method isNonnegative () false)
+  (method isStrictlyPositive () false )
+  (method negated () ( LargePositiveInteger withMagnitude: (self magnitude)))
+
+  (method * (anInteger) (anInteger multiplyByLargeNegativeInteger: self) )
+  (method multiplyByLargePositiveInteger: (anInteger) ( LargeNegativeInteger withMagnitude: ( (self magnitude) * (anInteger magnitude))) )
+  (method multiplyByLargeNegativeInteger: (anInteger) ( LargePositiveInteger withMagnitude: ( (self magnitude) * (anInteger magnitude)))  )
+
+  (method + (anInteger) (anInteger addLargeNegativeIntegerTo: self) )
+  (method addLargePositiveIntegerTo: (anInteger)   ( ((self magnitude) > (anInteger magnitude) ) ifTrue:ifFalse:
+    {(  LargeNegativeInteger withMagnitude: ( (self magnitude) - (anInteger magnitude)))}
+    {(  LargePositiveInteger withMagnitude: ( (anInteger magnitude) - (self magnitude)))}
+  )) 
+
+  (method addLargeNegativeIntegerTo: (anInteger) (  LargeNegativeInteger withMagnitude: ( (self magnitude) + (anInteger magnitude))) ) 
+  
+  
+  
+  
+  
+
+
+
 )
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Put your unit tests for Exercise 2 here
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;step 4 sign-query tests  
+
+(check-assert (( LargePositiveInteger withMagnitude: (Natural fromSmall: 4096)) isStrictlyPositive))
+(check-assert ((( LargeNegativeInteger withMagnitude: (Natural fromSmall: 0)) isStrictlyPositive) not))
+(check-assert ((( LargeNegativeInteger withMagnitude: (Natural fromSmall: 4096)) isStrictlyPositive) not))
+
+(check-assert (( LargePositiveInteger withMagnitude: (Natural fromSmall: 4096)) isNonnegative))
+(check-assert ((( LargeNegativeInteger withMagnitude: (Natural fromSmall: 4096)) isNonnegative) not))
+
+(check-assert ((( LargePositiveInteger withMagnitude: (Natural fromSmall: 4096)) isNegative) not))
+(check-assert ((( LargePositiveInteger withMagnitude: (Natural fromSmall: 0)) isNegative) not))
+(check-assert (( LargeNegativeInteger withMagnitude: (Natural fromSmall: 4096)) isNegative))
+
+;;step 6 testing negation and printing
+
+(check-assert (((( LargePositiveInteger withMagnitude: (Natural fromSmall: 4096)) negated ) isStrictlyPositive) not )      )
+(check-assert (( (( LargeNegativeInteger withMagnitude: (Natural fromSmall: 0)) negated)    isStrictlyPositive) not))
+(check-assert ((( LargeNegativeInteger withMagnitude: (Natural fromSmall: 4096)) negated )isStrictlyPositive) )
+
+(check-assert (((( LargePositiveInteger withMagnitude: (Natural fromSmall: 4096)) negated ) isNonnegative) not))
+(check-assert ((( LargeNegativeInteger withMagnitude: (Natural fromSmall: 4096)) negated ) isNonnegative) )
+
+(check-assert ((( LargePositiveInteger withMagnitude: (Natural fromSmall: 4096)) negated) isNegative) )
+(check-assert (((( LargePositiveInteger withMagnitude: (Natural fromSmall: 0)) negated ) isNegative) not) )
+(check-assert (((( LargeNegativeInteger withMagnitude: (Natural fromSmall: 4096)) negated ) isNegative) not))
+
+(check-print ( LargePositiveInteger withMagnitude: (Natural fromSmall: 4096)) 4096)
+(check-print ( LargePositiveInteger withMagnitude: (Natural fromSmall: 0)) 0)
+(check-print ( LargePositiveInteger withMagnitude: (Natural fromSmall: 123123112)) 123123112)
+(check-print ( LargeNegativeInteger withMagnitude: (Natural fromSmall: 0)) 0)
+(check-print ( LargeNegativeInteger withMagnitude: (Natural fromSmall: 3432342)) -3432342)
+(check-print ((LargeInteger fromSmall: 0) negated) 0)
+
+;;step 8: testing multiplication
+(check-print (( LargePositiveInteger withMagnitude: (Natural fromSmall: 3) ) * ( LargePositiveInteger withMagnitude: (Natural fromSmall: 4) ) ) 12)
+(check-print (( LargePositiveInteger withMagnitude: (Natural fromSmall: 4) ) * ( LargePositiveInteger withMagnitude: (Natural fromSmall: 5) ) ) 20)
+(check-print (( LargeNegativeInteger withMagnitude: (Natural fromSmall: 3) ) * ( LargePositiveInteger withMagnitude: (Natural fromSmall: 4) ) ) -12)
+(check-print (( LargeNegativeInteger withMagnitude: (Natural fromSmall: 3) ) * ( LargeNegativeInteger withMagnitude: (Natural fromSmall: 10) ) ) 30)
+(check-print (( LargePositiveInteger withMagnitude: (Natural fromSmall: 3) ) * ( LargePositiveInteger withMagnitude: (Natural fromSmall: 3) ) ) 9)
+(check-print (( LargePositiveInteger withMagnitude: (Natural fromSmall: 3) ) * ( LargePositiveInteger withMagnitude: (Natural fromSmall: 0) ) ) 0)
+(check-print (( LargePositiveInteger withMagnitude: (Natural fromSmall: 3) ) * ( LargeNegativeInteger withMagnitude: (Natural fromSmall: 0) ) ) 0)
+
+;;step 10 testing addition
+(check-print (( LargePositiveInteger withMagnitude: (Natural fromSmall: 3) ) + ( LargePositiveInteger withMagnitude: (Natural fromSmall: 4) ) ) 7)
+(check-print (( LargePositiveInteger withMagnitude: (Natural fromSmall: 3) ) + ( LargeNegativeInteger withMagnitude: (Natural fromSmall: 4) ) ) -1)
+(check-print (( LargePositiveInteger withMagnitude: (Natural fromSmall: 100) ) + ( LargeNegativeInteger withMagnitude: (Natural fromSmall: 4) ) ) 96)
+(check-print (( LargeNegativeInteger withMagnitude: (Natural fromSmall: 3) ) + ( LargePositiveInteger withMagnitude: (Natural fromSmall: 4) ) ) 1)
+(check-print (( LargeNegativeInteger withMagnitude: (Natural fromSmall: 30) ) + ( LargePositiveInteger withMagnitude: (Natural fromSmall: 4) ) ) -26)
+(check-print (( LargeNegativeInteger withMagnitude: (Natural fromSmall: 3) ) + ( LargeNegativeInteger withMagnitude: (Natural fromSmall: 4) ) ) -7)
+
+; We tested -158223 > -158223 (<False>),
+; starting from literals of class LargeInteger
+
+
+(((LargeInteger fromSmall: 223)
+    +
+     ((LargeInteger fromSmall: 1000)
+     *
+      ((LargeInteger fromSmall: 158)
+      +
+       ((LargeInteger fromSmall: 1000) * (LargeInteger fromSmall: 0))
+     )
+    )
+   )
+    negated
+   )
+
+(check-print
+  ((((LargeInteger fromSmall: 223)
+   +
+    ((LargeInteger fromSmall: 1000)
+    *
+     ((LargeInteger fromSmall: 158)
+     +
+      ((LargeInteger fromSmall: 1000) * (LargeInteger fromSmall: 0))
+    )
+   )
+  )
+   negated
+  )
+   >
+    (((LargeInteger fromSmall: 223)
+    +
+     ((LargeInteger fromSmall: 1000)
+     *
+      ((LargeInteger fromSmall: 158)
+      +
+       ((LargeInteger fromSmall: 1000) * (LargeInteger fromSmall: 0))
+     )
+    )
+   )
+    negated
+   )
+  )
+  <False>)
