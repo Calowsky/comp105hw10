@@ -27,21 +27,21 @@ example.
 
     In `(shapes add: aShape)`,
     
-      - The receiver is ...
-      - The argument is ...
-      - The message name is ...
+      - The receiver is shapes 
+      - The argument is aShape
+      - The message name is add:
 
     In `(shape drawOn: aCanvas)`,
     
-      - The receiver is ...
-      - The argument is ...
-      - The message name is ...
+      - The receiver is shape
+      - The argument is aCanvas
+      - The message name is drawOn:
 
     In `(shapes do: [block (shape) (shape drawOn: aCanvas)])`,
     
-      - The receiver is ...
-      - The argument is ...
-      - The message name is ...
+      - The receiver is shapes
+      - The argument is [block (shape) (shape drawOn: aCanvas)] 
+      - The message name is do:
 
 
     _You can now start to read code examples._
@@ -57,13 +57,13 @@ example.
     Given this information, how many arguments do each of the following messages
     take:
 
-      - `+` takes ... argument(s).
+      - `+` takes 1 argument(s).
 
-      - `<=` takes ... argument(s).
+      - `<=` takes 1 argument(s).
 
-      - `print` takes ... argument(s).
+      - `print` takes 0 argument(s).
 
-      - `draw:width:height:` takes ... argument(s).
+      - `draw:width:height:` takes 2 argument(s).
 
 
     _You now know what a message's name tells you about how to use it._
@@ -106,7 +106,8 @@ example.
           - A class object
           - An instance of a class
         
-        >
+        > An instance protocol is received by an instance of a class
+          A class protocol is received by a class object
 
 
     _You now know what you can do with each kind of message described
@@ -157,15 +158,18 @@ conditionals in SmallTalk.
         include a statement of what messages are sent to what objects
         and what method definition each message dispatches to.
 
-        >
+        > Because isNil is a different function for nil values versus non-nil values
+          Each object has is own implementation of isNil, which is dispatched at runtime.
 
+          The important distiction is that the data being acted on is fundamentally different,
+          rather than a variant of the same type (such as bool or datatype)
 
     (b) Explain _why_ it is desirable to implement object-oriented
         code without explicit conditional tests, and indeed, without
         ever asking an object, "how were you formed?"
 
-        >
-
+        > When writing class methods you always know what type you'll be acting on
+         So you can trust it later when you don't know the type you're acting on 
 
     _You are starting to learn how to work effectively in a world
     where we don't interrogate objects to see how they were formed or
