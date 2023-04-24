@@ -357,7 +357,6 @@
         ((self magnitude) - (anInteger magnitude)))}
       {(LargeNegativeInteger withMagnitude: 
         ((anInteger magnitude) - (self magnitude)))})) 
-
 )
 
 ;; Represents a negative integer

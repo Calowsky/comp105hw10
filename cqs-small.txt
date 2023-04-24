@@ -77,26 +77,23 @@ example.
     (a) Of the message names used in the transcript, which ones are
         part of the _class_ protocol for `Picture`?
 
-        >
+        > empty
         
 
         Which message names are part of the _instance_ protocol for
         `Picture`?
 
-        >
-
+        > add:, renderUsing:
     
         Which message names are part of the _class_ protocol for
         `TikzCanvas`?
 
-        >
-        
+        > new
 
         Which message names are part of the _instance_ protocol for
         `TikzCanvas`?
 
-        >
-
+        > startDrawing, stopDrawing, drawPolygon, drawEllipseAt
 
     (b) In general, what do you do with messages in a _class_ protocol, and how
         does that differ from what you do with messages in an _instance_
@@ -126,7 +123,7 @@ learn about the mechanisms of message send and dynamic dispatch .
 
       - Dispatch to method m1 on class ?
       - Dispatch to method  ? on class ?
-        ...
+        
 
     _You are starting to understand the key mechanism behind all of
     object-oriented programming._
@@ -244,7 +241,7 @@ design.
         with double dispatch, what is the name of the message it should send in
         response to a `+` message? 
 
-        > 
+        > addLargeIntegerTo:
 
 
     (b) Consider the execution of the following message send, where `lint` and
@@ -257,9 +254,9 @@ design.
         which will be referred to by name `self`? Use the names `sint` and/or
         `lint` to answer.
 
-        > ??? will be bound to `anInteger`
+        > lint will be bound to `anInteger`
         
-        > `self` will refer to ???
+        > `self` will refer to sint 
     
     (c) In the 7 lessons reading, methods `timesPos:` and `timesNeg:` were
         implemented. Given these methods and what you've learned about double
@@ -267,7 +264,9 @@ design.
         `LargePositiveInteger` class. It will be very similar to code chunk
         675b, and it should use either `timesPos:` or `timesNeg:`.
 
-        >
+        > (method * (anInteger)
+                (anInteger multiplyByLargePositiveInteger: self))
+
 
     _You are ready to implement arithmetic on large integers (exercise 2)._
 
