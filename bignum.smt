@@ -294,12 +294,11 @@
   (method magnitude () magnitude)
 
   (class-method fromSmall: (anInteger)
-     ((anInteger isNegative) ifTrue:ifFalse: ;; TODO test 0 - anInteger?
-;;        {(((self fromSmall: 1) + (self fromSmall: ((anInteger + 1) negated)))
-;;              negated)}
-        {((LargeNegativeInteger new) magnitude: (Natural fromSmall: (0 - anInteger)))}
+     ((anInteger isNegative) ifTrue:ifFalse:
+        {((LargeNegativeInteger new) magnitude: 
+            (Natural fromSmall: (0 - anInteger)))}
         {((LargePositiveInteger new) magnitude: 
-                 (Natural fromSmall: anInteger))}))
+            (Natural fromSmall: anInteger))}))
   (method isZero () (magnitude isZero))
   (method = (anInteger) ((self - anInteger)     isZero))
   (method < (anInteger) ((self - anInteger) isNegative))
