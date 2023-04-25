@@ -121,8 +121,8 @@ learn about the mechanisms of message send and dynamic dispatch .
 
     Please edit this answer to put in the correct methods and classes:
 
-      - Dispatch to method m1 on class ?
-      - Dispatch to method  ? on class ?
+      - Dispatch to method m1 on class B
+      - Dispatch to method  m2 on class B
         
 
     _You are starting to understand the key mechanism behind all of
@@ -155,18 +155,23 @@ conditionals in SmallTalk.
         include a statement of what messages are sent to what objects
         and what method definition each message dispatches to.
 
-        > Because isNil is a different function for nil values versus non-nil values
-          Each object has is own implementation of isNil, which is dispatched at runtime.
+        > Because isNil is a different function for nil values 
+          versus non-nil values
+          Each object has is own implementation of isNil, 
+          which is dispatched at runtime.
 
-          The important distiction is that the data being acted on is fundamentally different,
+          The important distiction is that the data being acted 
+          on is fundamentally different,
           rather than a variant of the same type (such as bool or datatype)
 
     (b) Explain _why_ it is desirable to implement object-oriented
         code without explicit conditional tests, and indeed, without
         ever asking an object, "how were you formed?"
 
-        > When writing class methods you always know what type you'll be acting on
-         So you can trust it later when you don't know the type you're acting on 
+        > When writing class methods you always know 
+        what type you'll be acting on
+         So you can trust it later when you don't 
+         know the type you're acting on 
 
     _You are starting to learn how to work effectively in a world
     where we don't interrogate objects to see how they were formed or
@@ -216,10 +221,10 @@ For question 6, read section 10.4.6 (stopping after getting to the end of page
                    the message from         Fraction        Number
                    the interactive prompt)
 
-        negated    Number                     ?                 ?
+        negated    Number                    Fraction       Fraction?
 
 
-        +             ?                       ?                 ?
+        +             Fraction                 Fraction       Fraction
 
                          ... fill in the ? marks ...
 

@@ -22,7 +22,7 @@
       {(NatZero new)}
       {((NatNonzero new) first:rest: anInteger aNatural)}))
 
-  (class-method base () 32767) ; private
+  (class-method base () 2) ; private
 
   ; private methods suggested from textbook (page 681)
   (method modBase () (self subclassResponsibility)) 
@@ -111,8 +111,8 @@
 (class NatNonzero
   [subclass-of Natural]
   [ivars m d] ; a non-zero natural number is of the form d + m * b, where d
-              ; is an integer representing a digit of base b, and m is a natural
-              ; number
+              ; is an integer representing a digit of base b, and m is
+              ; a natural number
   (method isZero () false)
   (method invariant () (((d < (Natural base)) & (d >= 0)) &  ;; private
                        (((m isZero) & (d = 0)) not)))
@@ -273,7 +273,44 @@
         (check-print ((Nat value: 87654321) * (Nat value: 12345678))
             1082152022374638)
 
-;; stress test
+;; All the tests that require base of 2
+        (check-print (DebugNat of: (Natural fromSmall: 0))
+                    0)
+        (check-print (DebugNat of: 
+                        (Natural fromSmall: ((Natural base) * (Natural base))))
+                    0,1,0,0)  ;; or it might have a leading zero
+        (check-print (DebugNat of: (Natural fromSmall: 1))
+                    0,1)
+        (check-print (DebugNat of: (Natural fromSmall: 1000))
+                    0,1,1,1,1,1,0,1,0,0,0)
+        (check-print (DebugNat of: (Natural fromSmall: 1234))
+                    0,1,0,0,1,1,0,1,0,0,1,0)
+        (check-print (DebugNat of: (Natural fromSmall: 4096))
+                    0,1,0,0,0,0,0,0,0,0,0,0,0,0)
+
+        (check-print (DebugNat of: ((Natural fromSmall: 4096) divBase ))
+                    0,1,0,0,0,0,0,0,0,0,0,0,0)
+
+        (check-print (DebugNat of: ((Natural fromSmall: 0) + 
+                                    (Natural fromSmall: 0)))
+                    0)
+        (check-print (DebugNat of: ((Natural fromSmall: 0) + 
+                                    (Natural fromSmall: 1)))
+                    0,1)
+        (check-print (DebugNat of: ((Natural fromSmall: 4) + 
+                                    (Natural fromSmall: 33)))
+                    0,1,0,0,1,0,1)
+        (check-print (DebugNat of: ((Natural fromSmall: 100) + 
+                                    (Natural fromSmall: 0)))
+                    0,1,1,0,0,1,0,0)
+
+        (check-print (DebugNat of: ((Natural fromSmall: 15) sdiv: 2))
+                    0,1,1,1)
+        (check-print (DebugNat of: ((Natural fromSmall: 0) sdiv: 2))
+                    0)
+        (check-print (DebugNat of: ((Natural fromSmall: 11) sdiv: 4))
+                    0,1,0)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -460,34 +497,3 @@
         (check-print ((Neg value: 3) + (Pos value: 4)) 1)
         (check-print ((Neg value: 30) + (Pos value: 4)) -26)
         (check-print ((Neg value: 3) + (Neg value: 4)) -7)
-
-        ; We tested -158223 > -158223 (<False>),
-        ; starting from literals of class LargeInteger
-        (((Int value: 223)
-            +
-             ((Int value: 1000)
-             *
-              ((Int value: 158)
-              +
-               ((Int value: 1000) * (Int value: 0)))))
-            negated)
-
-        (check-print
-          ((((Int value: 223)
-            +
-             ((Int value: 1000)
-             *
-              ((Int value: 158)
-              +
-               ((Int value: 1000) * (Int value: 0)))))
-           negated)
-           >
-          (((Int value: 223)
-            +
-             ((Int value: 1000)
-             *
-              ((Int value: 158)
-              +
-               ((Int value: 1000) * (Int value: 0)))))
-            negated))
-          <False>)
