@@ -224,7 +224,7 @@ For question 6, read section 10.4.6 (stopping after getting to the end of page
         negated    Number                    Fraction       Fraction?
 
 
-        +             Fraction                 Fraction       Fraction
+        +             Number                Fraction       Fraction
 
                          ... fill in the ? marks ...
 
